@@ -1,6 +1,15 @@
 // GLOBALS VARIABLES;
 const itemSection = document.querySelector('.items');
 const olCart = document.querySelector('.cart__items');
+const btnClearCart = document.querySelector('.empty-cart');
+
+const saveCart = () => {
+  localStorage.setItem('savedProducts', olCart.innerHTML);
+};
+
+const loadCart = () => {
+  olCart.innerHTML = localStorage.getItem('savedProducts');
+};
 
 function createProductImageElement(imageSource) {
   const img = document.createElement('img');
@@ -19,7 +28,10 @@ function createCustomElement(element, className, innerText) {
 function cartItemClickListener(event) {
   const limparCarrinho = event.target.remove();
   console.log(limparCarrinho);
+  saveCart();
 }
+
+olCart.addEventListener('click', (cartItemClickListener));
 
 function createCartItemElement({ sku, name, salePrice }) {
   const li = document.createElement('li');
@@ -27,6 +39,7 @@ function createCartItemElement({ sku, name, salePrice }) {
   li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
   li.addEventListener('click', cartItemClickListener);
   olCart.appendChild(li);
+  saveCart();
   return li;
 }
 
@@ -69,6 +82,14 @@ const fetchApiList = (produto = 'computador') => {
     });
 };
 
+const clearCart = () => {
+  olCart.innerHTML = '';
+  saveCart();
+};
+
+btnClearCart.addEventListener('click', (clearCart));
+
 window.onload = () => {
   fetchApiList();
+  loadCart();
 };
