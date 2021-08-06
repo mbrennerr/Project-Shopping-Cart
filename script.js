@@ -3,6 +3,7 @@ const itemSection = document.querySelector('.items');
 const olCart = document.querySelector('.cart__items');
 const btnClearCart = document.querySelector('.empty-cart');
 const loading = document.querySelector('.loading');
+const totalPrice = document.querySelector('.total-price');
 
 const saveCart = () => {
   localStorage.setItem('savedProducts', olCart.innerHTML);
@@ -10,6 +11,14 @@ const saveCart = () => {
 
 const loadCart = () => {
   olCart.innerHTML = localStorage.getItem('savedProducts');
+};
+
+const savePrice = () => {
+  localStorage.setItem('savedPrice', totalPrice.innerHTML);
+};
+
+const loadPrice = () => {
+  totalPrice.innerHTML = localStorage.getItem('savedPrice');
 };
 
 function createProductImageElement(imageSource) {
@@ -26,9 +35,21 @@ function createCustomElement(element, className, innerText) {
   return e;
 }
 
+const priceCalculate = (salePrice, operator) => {
+  let price = Number(totalPrice.innerHTML) || 0;
+  if (operator === '+') {
+    price += (salePrice);
+  } else {
+    price -= (salePrice) / 2;
+  }
+  totalPrice.innerHTML = price;
+  savePrice();
+};
+
 function cartItemClickListener(event) {
-  const limparCarrinho = event.target.remove();
-  console.log(limparCarrinho);
+  event.target.remove();
+  const priceTreatment = event.target.innerHTML.split('$')[1];
+  priceCalculate(priceTreatment, '-');
   saveCart();
 }
 
@@ -40,6 +61,7 @@ function createCartItemElement({ sku, name, salePrice }) {
   li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
   li.addEventListener('click', cartItemClickListener);
   olCart.appendChild(li);
+  priceCalculate(salePrice, '+');
   saveCart();
   return li;
 }
@@ -85,10 +107,12 @@ const fetchApiList = (produto = 'computador') => {
       });
   }, 0);
 };
-
+// BOTÃO DE LIMPAR CARRINHO;
 const clearCart = () => {
   olCart.innerHTML = '';
+  totalPrice.innerHTML = 0;
   saveCart();
+  savePrice();
 };
 
 btnClearCart.addEventListener('click', (clearCart));
@@ -96,4 +120,5 @@ btnClearCart.addEventListener('click', (clearCart));
 window.onload = () => {
   fetchApiList();
   loadCart();
+  loadPrice();
 };
